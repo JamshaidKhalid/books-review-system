@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'customer.apps.CustomerConfig',
+    'books.apps.BooksConfig',
+    'genre.apps.GenreConfig',
+    'orders.apps.OrdersConfig',
+    'payments.apps.PaymentsConfig',
+    'reviews.apps.ReviewsConfig',
+    'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
 ]
 
