@@ -1,6 +1,7 @@
+# customers/serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from genre.models import Genre  # Make sure to import Genre model
+from genre.models import Genre
 
 Customer = get_user_model()
 
@@ -21,15 +22,27 @@ class CustomerRegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        username = validated_data.get('username')
-        email = validated_data.get('email')
-        password = validated_data.get('password')
-        name = validated_data.get('name')
         genres = validated_data.pop('genres', [])
-
-        customer = Customer(username=username, email=email, name=name)
+        password = validated_data.pop('password')
+        customer = Customer(**validated_data)
         customer.set_password(password)
         customer.save()
-
-        customer.genres.set(genres)  # Add genres after saving the user
+        customer.genres.set(genres)
         return customer
+
+class CustomerSerializer(serializers.ModelSerializer):
+    genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)
+    followers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    following = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Customer
+        fields = [
+            'id',
+            'username',
+            'email',
+            'name',
+            'genres',
+            'followers',
+            'following',
+        ]

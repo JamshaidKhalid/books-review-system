@@ -1,32 +1,39 @@
-from django.shortcuts import render
-
-from rest_framework.views import APIView
+# customers/views.py
+from rest_framework import generics, viewsets, permissions
 from rest_framework.response import Response
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+from .serializers import CustomerRegisterSerializer, CustomerSerializer
 
+Customer = get_user_model()
 
-from customer.serializers import CustomerRegisterSerializer
-
-class RegisterCustomerAPIView(APIView):
+class CustomerRegisterView(generics.CreateAPIView):
+    queryset = Customer.objects.all()
     serializer_class = CustomerRegisterSerializer
+    permission_classes = [AllowAny]
 
-    def post(self, request, format=None):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            customer = serializer.save()
-            serialized_data = serializer.data
-            return Response(serialized_data, status=201)
-        return Response(serializer.errors, status=400)
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return Customer.objects.filter(id=self.request.user.id)
 
-class LogoutAPIView(APIView):
-    def post(self, request):
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+class LogoutView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
         try:
-            refresh_token = request.data.get("refresh_token")
-            print(refresh_token)
+            refresh_token = request.data["refresh"]
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({'success': 'User logged out successfully'}, status=200)
+            return Response(status=205)
         except Exception as e:
-            return Response({'error': 'Something went wrong'}, status=400)
+            return Response(status=400)
