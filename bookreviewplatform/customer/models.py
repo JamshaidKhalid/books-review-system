@@ -26,7 +26,7 @@ class Customer(AbstractUser):
     followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']  # Remove `email` from REQUIRED_FIELDS
+    REQUIRED_FIELDS = ['username']  
 
     objects = CustomUserManager()
 

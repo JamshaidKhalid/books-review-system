@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-// import { login, signup } from '../services/auth.service';
+import { login, signup } from '../services/auth.service';
 
 interface AuthFormProps {
   formType: 'signin' | 'signup';
@@ -21,38 +21,42 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = async (values: { email: string; password: string }) => {
+  const handleSubmit = async (values: { email: string; password: string; name?: string; username?: string }) => {
     setLoading(true);
 
-    // try {
-    //   if (formType === 'signin') {
-    //     await login(values.email, values.password); 
-    //     toast.success('Login successful');
-    //     setTimeout(() => {
-    //       navigate('/dashboard');
-    //     }, 1000)
-    //   } else {
-    //     await signup(values.email, values.password); 
-    //     toast.success('Signup successful');
-    //     navigate('/signin');
-    //   }
-    // } catch (e) {
-    //   toast.error('An error occurred');
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      if (formType === 'signin') {
+        await login(values.email, values.password);
+        toast.success('Login successful');
+        setTimeout(() => {
+          navigate('/books');
+        }, 1000);
+      } else {
+        await signup(values.username!, values.email, values.password, values.name!);
+        toast.success('Signup successful');
+        navigate('/signin');
+      }
+    } catch (e) {
+      toast.error('An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Required'),
     password: Yup.string().required('Required'),
+    ...(formType === 'signup' && {
+      name: Yup.string().required('Required'),
+      username: Yup.string().required('Required'),
+    }),
   });
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Toaster />
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ email: '', password: '', name: '', username: '' }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -61,6 +65,36 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
             <h3 className="mb-12 text-3xl font-bold text-center">
               {formType === 'signin' ? 'Log In to start your journey' : 'Sign Up to start your journey'}
             </h3>
+            {formType === 'signup' && (
+              <>
+                <div className="mb-8">
+                  <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">
+                    Name
+                  </label>
+                  <Field
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter your name"
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
+                </div>
+                <div className="mb-8">
+                  <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-700">
+                    Username
+                  </label>
+                  <Field
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <ErrorMessage name="username" component="div" className="text-red-500 text-sm mt-1" />
+                </div>
+              </>
+            )}
             <div className="mb-8">
               <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
                 Email

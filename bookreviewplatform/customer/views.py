@@ -26,14 +26,4 @@ class CustomerViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-class LogoutView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
-        try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response(status=205)
-        except Exception as e:
-            return Response(status=400)
