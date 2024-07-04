@@ -22,3 +22,16 @@ export interface Book {
   cover_image: string;
   reviews: Review[];
 }
+
+export interface AuthResponse {
+  refresh: string;
+  access: string;
+  id: number;
+}
+
+export interface SignupResponse {
+  username: string;
+  email: string;
+  name: string;
+  genres: string[];
+}

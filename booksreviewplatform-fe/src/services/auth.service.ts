@@ -1,46 +1,95 @@
 import axios from 'axios';
-import { AuthResponse, SignupResponse } from '../types';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = `http://localhost:8000`;
 
-export const login = async (email: string, password: string): Promise<AuthResponse> => {
+export const login = async (email: string, password: string) => {
   try {
-    console.log(BASE_URL);
-    const response = await axios.post<AuthResponse>(`${BASE_URL}/login/`, { email, password });
-    const { access, refresh } = response.data;
+    const response = await axios.post(`${BASE_URL}/login/`, {
+      email,
+      password
+    });
+    const { access, refresh, id } = response.data;
     localStorage.setItem('accessToken', access);
     localStorage.setItem('refreshToken', refresh);
-    localStorage.setItem('email', email);
+    localStorage.setItem('userId', id);
+    localStorage.setItem('email', email)
     return response.data;
   } catch (error) {
-    throw new Error('Login failed');
+    throw new Error('Operation failed');
   }
 };
 
-export const signup = async (username: string, email: string, password: string, name: string): Promise<SignupResponse> => {
+export const signup = async (email: string, username: string, name: string, password: string) => {
   try {
-    console.log(BASE_URL);
-    const response = await axios.post<SignupResponse>(`${BASE_URL}/register/`, { username, email, password, name });
-    return response.data;
-  } catch (error) {
-    throw new Error('Signup failed');
-  }
-};
-
-export const logout = async (): Promise<void> => {
-  try {
-    const refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-    await axios.post(`${BASE_URL}/logout/`, {
-      refresh: refreshToken
-    }, {
+    const response = await axios.post(`${BASE_URL}/register/`, {
+      email,
+      username,
+      name,
+      password
     });
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('email');
+    return response.data;
   } catch (error) {
-    throw new Error('Logout failed');
+    throw new Error('Operation failed');
+  }
+};
+
+export const fetchFollowers = async (userId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/profile/${userId}/followers/`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Operation failed');
+  }
+};
+
+export const fetchFollowing = async (userId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/profile/${userId}/following/`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Operation failed');
+  }
+};
+
+export const fetchListUsers = async (userId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/list_users/`, {
+      params: {
+        user_id: userId
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Operation failed');
+  }
+};
+
+export const followUser = async (userId: number, userToFollowId: number) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/profile/follow/`,
+      {
+        user_id: userId,
+        user_to_follow_id: userToFollowId
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error('Operation failed');
+  }
+};
+
+export const unfollowUser = async (userId: number, userToUnfollowId: number) => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/profile/unfollow/`,
+      {
+        user_id: userId,
+        user_to_unfollow_id: userToUnfollowId
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error('Operation failed');
   }
 };
