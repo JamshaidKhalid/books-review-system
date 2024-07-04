@@ -34,7 +34,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
       } else {
         await signup(values.username!, values.email, values.password, values.name!);
         toast.success('Signup successful');
-        navigate('/signin');
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
       }
     } catch (e) {
       toast.error('An error occurred');
@@ -62,12 +64,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
       >
         {({ isSubmitting }) => (
           <Form className="w-full max-w-md p-8 bg-white rounded shadow-md">
-            <h3 className="mb-12 text-3xl font-bold text-center">
+            <h3 className="mb-4 text-3xl font-bold text-center">
               {formType === 'signin' ? 'Log In to start your journey' : 'Sign Up to start your journey'}
             </h3>
             {formType === 'signup' && (
               <>
-                <div className="mb-8">
+                <div className="mb-5">
                   <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">
                     Name
                   </label>
@@ -80,7 +82,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
                   />
                   <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
                 </div>
-                <div className="mb-8">
+                <div className="mb-4">
                   <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-700">
                     Username
                   </label>
@@ -95,7 +97,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
                 </div>
               </>
             )}
-            <div className="mb-8">
+            <div className="mb-4">
               <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
                 Email
               </label>
@@ -108,7 +110,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
               />
               <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
             </div>
-            <div className="mb-8">
+            <div className="mb-4">
               <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
                 Password
               </label>
@@ -129,7 +131,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ formType }) => {
               </div>
               <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
             </div>
-            <div className="mb-8 text-center">
+            <div className="mb-4 text-center">
               <span className="text-sm font-medium">
                 {formType === 'signin' ? "Don't have an account? " : 'Already have an account? '}
                 <Link
