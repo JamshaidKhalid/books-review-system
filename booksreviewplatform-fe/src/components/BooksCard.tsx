@@ -3,6 +3,7 @@ import { Genre, Review } from '../types';
 import Modal from './Modal';
 import StarRatings from 'react-star-ratings';
 import { addReview } from '../services/books.service';
+import Button from './Button';
 
 interface BookCardProps {
   id: number;
@@ -51,6 +52,14 @@ const BookCard: React.FC<BookCardProps> = ({
     }
   };
 
+  const calculateAverageRating = () => {
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return totalRating / reviews.length;
+  };
+
+  const averageRating = calculateAverageRating();
+
   return (
     <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white m-4">
       <img className="w-full h-64 object-cover" src={coverImage} alt={title} />
@@ -63,34 +72,49 @@ const BookCard: React.FC<BookCardProps> = ({
         </div>
       </div>
       <div className="flex justify-between px-2 py-2 my-1">
-        <button
-          onClick={toggleReviewsModal}
-          className="bg-white hover:bg-black hover:text-white text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out"
-        >
-          Show Reviews
-        </button>
-        <button
-          onClick={toggleAddReviewModal}
-          className="bg-white hover:bg-black hover:text-white text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out"
-        >
-          Add Review
-        </button>
-        <button className="bg-white hover:text-white hover:bg-black text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out">
-          Buy Book
-        </button>
+        <Button onClick={toggleReviewsModal}>Show Reviews</Button>
+        <Button onClick={toggleAddReviewModal}>Add Review</Button>
+        <Button onClick={{}}>Buy Book</Button>
       </div>
 
       {/* Modals */}
       {showReviewsModal && (
         <Modal closeModal={toggleReviewsModal}>
           <h2 className="text-xl font-bold mb-2">Reviews</h2>
+          <div className="flex items-center mb-4">
+            <StarRatings
+              rating={averageRating}
+              starRatedColor="#f8ca4d"
+              starEmptyColor="#cbd5e0"
+              numberOfStars={5}
+              starDimension="20px"
+              starSpacing="2px"
+            />
+            <span className="ml-2 text-lg font-semibold text-gray-700">
+              {averageRating.toFixed(1)} / 5
+            </span>
+          </div>
           <div className="flex flex-col gap-4">
-            {reviews.map((review) => (
-              <div key={review.id}>
-                <strong>Rating: {review.rating}</strong>
-                <p>{review.text}</p>
-              </div>
-            ))}
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
+                <div key={review.id} className="border p-2 rounded-md">
+                  <div className="flex items-center">
+                    <StarRatings
+                      rating={review.rating}
+                      starRatedColor="#f8ca4d"
+                      starEmptyColor="#cbd5e0"
+                      numberOfStars={5}
+                      starDimension="16px"
+                      starSpacing="1px"
+                    />
+                    <strong className="ml-2 text-gray-800">Rating: {review.rating}</strong>
+                  </div>
+                  <p className="text-gray-700 mt-1">{review.text}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-700 text-center">No reviews yet. Be the first to review this book!</p>
+            )}
           </div>
         </Modal>
       )}
@@ -125,12 +149,7 @@ const BookCard: React.FC<BookCardProps> = ({
               onChange={(e) => setReviewText(e.target.value)}
             ></textarea>
           </div>
-          <button
-            onClick={handleAddReview}
-            className="bg-white hover:text-white hover:bg-black text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out"
-          >
-            Submit Review
-          </button>
+          <Button onClick={handleAddReview}>Submit Review</Button>
         </Modal>
       )}
     </div>

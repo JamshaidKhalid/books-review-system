@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaChevronDown } from 'react-icons/fa';
 import FollowersModal from './FollowersModal';
 import FollowingModal from './FollowingModal';
 import SuggestedUsersModal from './SuggestedUsersModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { logout } from '../services/auth.service';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const email = localStorage.getItem('email');
 
+  const [showDropdown, setShowDropdown] = useState(false);
   const [showFollowers, setShowFollowers] = useState(false);
   const [showFollowing, setShowFollowing] = useState(false);
   const [showSuggestedUsers, setShowSuggestedUsers] = useState(false);
 
   const handleLogout = async () => {
-    localStorage.clear();
-    toast.success('Logged out successfully!');
-    navigate('/signin');
+    await logout();
+    toast.success('Logged out successfully');
+    setTimeout(() => {
+      navigate('/');
+    }, 2000);
+  };
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
   };
 
   return (
@@ -30,35 +39,41 @@ const Navbar: React.FC = () => {
           </Link>
           {email ? (
             <div className="relative">
-              <button className="text-white focus:outline-none">
+              <button
+                onClick={toggleDropdown}
+                className="text-white flex items-center focus:outline-none"
+              >
                 {email}
+                <FaChevronDown className="ml-2" />
               </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
-                <button
-                  onClick={() => setShowFollowers(true)}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Followers
-                </button>
-                <button
-                  onClick={() => setShowFollowing(true)}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Following
-                </button>
-                <button
-                  onClick={() => setShowSuggestedUsers(true)}
-                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Suggested Users
-                </button>
-              </div>
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={() => setShowFollowers(true)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Followers
+                  </button>
+                  <button
+                    onClick={() => setShowFollowing(true)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Following
+                  </button>
+                  <button
+                    onClick={() => setShowSuggestedUsers(true)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Suggested Users
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div>

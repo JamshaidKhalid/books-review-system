@@ -19,6 +19,24 @@ export const login = async (email: string, password: string) => {
   }
 };
 
+export const logout = async (): Promise<void> => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+    await axios.post(`${BASE_URL}/logout/`, {
+      refresh: refreshToken
+    }, {
+    });
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('email');
+  } catch (error) {
+    throw new Error('Logout failed');
+  }
+};
+
 export const signup = async (email: string, username: string, name: string, password: string) => {
   try {
     const response = await axios.post(`${BASE_URL}/register/`, {

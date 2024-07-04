@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchListUsers, followUser } from '../services/auth.service';
+import ClipLoader from 'react-spinners/ClipLoader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,12 +11,22 @@ interface ModalProps {
 
 const SuggestedUsersModal: React.FC<ModalProps> = ({ show, onClose }) => {
   const [suggestedUsers, setSuggestedUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const userId = parseInt(localStorage.getItem('userId') || '0');
   const [followingState, setFollowingState] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     if (show && userId) {
-      fetchListUsers(userId).then(setSuggestedUsers).catch(console.error);
+      setLoading(true);
+      fetchListUsers(userId)
+        .then((data) => {
+          setSuggestedUsers(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setLoading(false);
+        });
     }
   }, [show, userId]);
 
@@ -41,21 +52,27 @@ const SuggestedUsersModal: React.FC<ModalProps> = ({ show, onClose }) => {
           <div className="mt-3 text-center">
             <h3 className="text-lg leading-6 font-medium text-gray-900">Suggested Users</h3>
             <div className="mt-2">
-              {suggestedUsers.map((user: any) => (
-                <div key={user.id} className="mb-2 flex justify-between items-center">
-                  {user.username}
-                  {followingState[user.id] ? (
-                    <span className="text-green-500">Following</span>
-                  ) : (
-                    <button
-                      onClick={() => handleFollow(user.id)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      Follow
-                    </button>
-                  )}
+              {loading ? (
+                <div className="flex justify-center items-center h-32">
+                  <ClipLoader color={"#4A90E2"} loading={loading} size={50} />
                 </div>
-              ))}
+              ) : (
+                suggestedUsers.map((user: any) => (
+                  <div key={user.id} className="mb-2 flex justify-between items-center">
+                    {user.username}
+                    {followingState[user.id] ? (
+                      <span className="text-green-500">Following</span>
+                    ) : (
+                      <button
+                        onClick={() => handleFollow(user.id)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Follow
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
             <div className="items-center px-4 py-3">
               <button

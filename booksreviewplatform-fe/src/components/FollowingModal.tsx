@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchFollowing, unfollowUser } from '../services/auth.service';
+import ClipLoader from 'react-spinners/ClipLoader';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -10,11 +11,21 @@ interface ModalProps {
 
 const FollowingModal: React.FC<ModalProps> = ({ show, onClose }) => {
   const [following, setFollowing] = useState([]);
+  const [loading, setLoading] = useState(true);
   const userId = parseInt(localStorage.getItem('userId') || '0');
 
   useEffect(() => {
     if (show && userId) {
-      fetchFollowing(userId).then(setFollowing).catch(console.error);
+      setLoading(true);
+      fetchFollowing(userId)
+        .then((data) => {
+          setFollowing(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setLoading(false);
+        });
     }
   }, [show, userId]);
 
@@ -40,17 +51,23 @@ const FollowingModal: React.FC<ModalProps> = ({ show, onClose }) => {
           <div className="mt-3 text-center">
             <h3 className="text-lg leading-6 font-medium text-gray-900">Following</h3>
             <div className="mt-2">
-              {following.map((follow: any) => (
-                <div key={follow.id} className="mb-2 flex justify-between items-center">
-                  {follow.username}
-                  <button
-                    onClick={() => handleUnfollow(follow.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Unfollow
-                  </button>
+              {loading ? (
+                <div className="flex justify-center items-center h-32">
+                  <ClipLoader color={"#4A90E2"} loading={loading} size={50} />
                 </div>
-              ))}
+              ) : (
+                following.map((follow: any) => (
+                  <div key={follow.id} className="mb-2 flex justify-between items-center">
+                    {follow.username}
+                    <button
+                      onClick={() => handleUnfollow(follow.id)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Unfollow
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
             <div className="items-center px-4 py-3">
               <button

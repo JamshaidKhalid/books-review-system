@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchFollowers } from '../services/auth.service';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 interface ModalProps {
   show: boolean;
@@ -8,11 +9,21 @@ interface ModalProps {
 
 const FollowersModal: React.FC<ModalProps> = ({ show, onClose }) => {
   const [followers, setFollowers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const userId = parseInt(localStorage.getItem('userId') || '0');
 
   useEffect(() => {
     if (show && userId) {
-      fetchFollowers(userId).then(setFollowers).catch(console.error);
+      setLoading(true);
+      fetchFollowers(userId)
+        .then((data) => {
+          setFollowers(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setLoading(false);
+        });
     }
   }, [show, userId]);
 
@@ -26,11 +37,17 @@ const FollowersModal: React.FC<ModalProps> = ({ show, onClose }) => {
         <div className="mt-3 text-center">
           <h3 className="text-lg leading-6 font-medium text-gray-900">Followers</h3>
           <div className="mt-2">
-            {followers.map((follower: any) => (
-              <div key={follower.id} className="mb-2">
-                {follower.username}
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <ClipLoader color={"#4A90E2"} loading={loading} size={50} />
               </div>
-            ))}
+            ) : (
+              followers.map((follower: any) => (
+                <div key={follower.id} className="mb-2">
+                  {follower.username}
+                </div>
+              ))
+            )}
           </div>
           <div className="items-center px-4 py-3">
             <button
