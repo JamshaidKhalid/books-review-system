@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { SignupResponse } from '../types';
 
 const BASE_URL = `http://localhost:8000`;
 
@@ -37,17 +38,13 @@ export const logout = async (): Promise<void> => {
   }
 };
 
-export const signup = async (email: string, username: string, name: string, password: string) => {
+export const signup = async (username: string, email: string, password: string, name: string): Promise<SignupResponse> => {
   try {
-    const response = await axios.post(`${BASE_URL}/register/`, {
-      email,
-      username,
-      name,
-      password
-    });
+    console.log(BASE_URL);
+    const response = await axios.post<SignupResponse>(`${BASE_URL}/register/`, { username, email, password, name });
     return response.data;
   } catch (error) {
-    throw new Error('Operation failed');
+    throw new Error('Signup failed');
   }
 };
 

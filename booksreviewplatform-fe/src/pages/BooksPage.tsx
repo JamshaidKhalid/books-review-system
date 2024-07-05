@@ -47,7 +47,8 @@ const BooksPage: React.FC = () => {
                 author={book.author}
                 publication_date={book.publication_date}
                 genres={book.genres}
-                reviews={book.reviews}  // Pass the reviews to BookCard
+                reviews={book.reviews}
+                price = {book.price}
               />
             ))}
           </div>

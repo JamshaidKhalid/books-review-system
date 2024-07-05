@@ -22,6 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-h69mdy8gb%x2k^_o#0m3l@f7ty2v664s1^pl6t%pv%p4c0cnw@'
+STRIPE_SECRET_KEY = 'sk_test_51PYnXiGl2azh90R8pxsbS0Qz0zvr5h2heQzXGbNgngMUBPBDgg3vNGcEgBEeUC0KjfRE0dZwr0XV5JomP29JsYpp00CiEbOJG7'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -111,8 +113,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:3000",
-    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

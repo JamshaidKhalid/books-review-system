@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 class CustomerRegisterView(generics.CreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()

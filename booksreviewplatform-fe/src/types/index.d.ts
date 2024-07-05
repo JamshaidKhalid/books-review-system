@@ -21,6 +21,7 @@ export interface Book {
   genres: Genre[];
   cover_image: string;
   reviews: Review[];
+  price: number;
 }
 
 export interface AuthResponse {

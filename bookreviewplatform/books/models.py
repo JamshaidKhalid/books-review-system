@@ -1,6 +1,6 @@
-
+# books/models.py
 from django.db import models
-from genre.models import Genre  
+from genre.models import Genre
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
@@ -8,6 +8,7 @@ class Book(models.Model):
     publication_date = models.DateField()
     genres = models.ManyToManyField(Genre)
     cover_image = models.ImageField(upload_to='book_covers/', blank=True, null=True)
+    price = models.PositiveIntegerField(default=1000)  
 
     def __str__(self):
         return self.title

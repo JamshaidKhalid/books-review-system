@@ -3,7 +3,12 @@ import { Genre, Review } from '../types';
 import Modal from './Modal';
 import StarRatings from 'react-star-ratings';
 import { addReview } from '../services/books.service';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import BuyBookForm from './BuyBookForm'
 import Button from './Button';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 interface BookCardProps {
   id: number;
@@ -13,6 +18,7 @@ interface BookCardProps {
   publication_date: string;
   genres: Genre[];
   reviews: Review[];
+  price: number;
 }
 
 const BookCard: React.FC<BookCardProps> = ({
@@ -22,10 +28,12 @@ const BookCard: React.FC<BookCardProps> = ({
   author,
   publication_date,
   genres,
-  reviews: initialReviews,
+  reviews: initialReviews = [],
+  price,
 }) => {
   const [showReviewsModal, setShowReviewsModal] = useState(false);
   const [addReviewModal, setAddReviewModal] = useState(false);
+  const [buyBookModal, setBuyBookModal] = useState(false);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
@@ -36,6 +44,10 @@ const BookCard: React.FC<BookCardProps> = ({
 
   const toggleAddReviewModal = () => {
     setAddReviewModal(!addReviewModal);
+  };
+
+  const toggleBuyBookModal = () => {
+    setBuyBookModal(!buyBookModal);
   };
 
   const handleRatingChange = (newRating: number) => {
@@ -70,11 +82,27 @@ const BookCard: React.FC<BookCardProps> = ({
         <div className="text-gray-700 text-base">
           Genres: {genres.map((genre) => genre.name).join(', ')}
         </div>
+        <div className="text-gray-700 text-base font-bold">Price: ${(price / 100).toFixed(2) }</div>
       </div>
       <div className="flex justify-between px-2 py-2 my-1">
-        <Button onClick={toggleReviewsModal}>Show Reviews</Button>
-        <Button onClick={toggleAddReviewModal}>Add Review</Button>
-        <Button onClick={{}}>Buy Book</Button>
+        <button
+          onClick={toggleReviewsModal}
+          className="bg-white hover:bg-black hover:text-white text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out"
+        >
+          Show Reviews
+        </button>
+        <button
+          onClick={toggleAddReviewModal}
+          className="bg-white hover:bg-black hover:text-white text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out"
+        >
+          Add Review
+        </button>
+        <button
+          onClick={toggleBuyBookModal}
+          className="bg-white hover:text-white hover:bg-black text-black font-normal mx-1 py-1 px-2 border border-black rounded transition duration-300 ease-in-out"
+        >
+          Buy Book
+        </button>
       </div>
 
       {/* Modals */}
@@ -150,6 +178,15 @@ const BookCard: React.FC<BookCardProps> = ({
             ></textarea>
           </div>
           <Button onClick={handleAddReview}>Submit Review</Button>
+        </Modal>
+      )}
+
+      {buyBookModal && (
+        <Modal closeModal={toggleBuyBookModal}>
+          <h2 className="text-xl font-bold mb-2">Confirm Purchase</h2>
+          <Elements stripe={stripePromise}>
+            <BuyBookForm bookId={id} bookName={title} price={price} />
+          </Elements>
         </Modal>
       )}
     </div>
